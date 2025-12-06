@@ -1,37 +1,74 @@
-=== Persian Fake contents ===
-
-author: Grizzly development Group.
-
-Contributors: Ehsan Shariaty
-
-Tags: persian,parsi,farsi,iran,iranian,fa_IR,fake,
-فارسی,محتوا
-Tested up to: 5.6.1
-
-Requires PHP: 5.3
-
-License: GPLv2 or later
-
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
-
-
-
-A tool for persian wordpress developers to create Fake posts in Persian/Farsi language
+=== محتوای جعلی فارسی ===
+Contributors: ehsan957
+Tags: persian, content, فارسی, fake, محتوا, lorem ipsum
+Donate link: mailto:ehsan.shariaty@gmail.com
+Tested up to: 6.9
+Requires at least: 5.9
+Requires PHP: 8.0
+Stable tag: 1.3.0
+License: GPL 3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 == Description ==
-A tool for persian wordpress developers to create Fake posts in Persian/Farsi language.
-این یک ابزار ساده و رایگان برای طراحان سایت با سیستم مدیریت محتوای وردپرس است که این امکان را فراهم می‌آورد تا مطالب جعلی به زبان فارسی ایجاد کنند.
+**محتوای جعلی فارسی**  
+A tool for Persian WordPress developers to quickly create fake posts/pages in Persian/Farsi for testing and development.
+
+این یک ابزار ساده و رایگان برای طراحان سایت با سیستم مدیریت محتوای وردپرس است که این امکان را فراهم می‌آورد تا مطالب جعلی به زبان فارسی ایجاد کنند. مناسب برای تست قالب‌ها، چیدمان‌ها، فهرست‌ها و سایدبارها با متن و عنوان فارسی.
+
+= Features =
+* ایجاد محتوای جعلی برای **پست‌ها، برگه‌ها و پست‌تایپ‌های سفارشی**
+* تعیین وضعیت انتشار: پیش‌نویس، منتشرشده، در انتظار بازبینی
+* تعیین نویسنده و دسته‌بندی
+* ایجاد تصویر شاخص ساده (Placeholder) با استفاده از GD (اختیاری)
+* نمایش و **حذف یک‌جای** همه‌ی آیتم‌های ایجادشده
+* دیکشنری واژه‌های فارسی (SQLite) با **جایگزین JSON** در صورت نبود SQLite3
+* پشتیبانی از i18n و متن‌دومین استاندارد
+
+= Compatibility =
+* سازگار با **WordPress 6.9**
+* سازگار با **PHP 8.0 تا 8.4**
+* قابل استفاده در سایت‌های چندکاربره (Multisite) در حالت فعال‌سازی تکی هر ساب‌سایت
+
+== Frequently asked questions ==
+
+= راهنمای نصب =
+1. افزونه را نصب و فعال کنید.
+2. در صفحه ابزارها (Tools) تعداد پست‌های جعلی را وارد و دکمه ایجاد را بزنید. به همان تعداد پست فارسی با پاراگراف‌های تصادفی و (در صورت انتخاب) تصویر شاخص ساخته می‌شود.
+3. می‌توانید این کار را بارها تکرار کنید.
+4. تمام پست‌های ایجادشده از طریق همین افزونه قابل حذف هستند.
+
+== Screenshots ==
+به‌زودی با تصاویر جدید!
 
 == Changelog ==
-= 1.0 =
-	First release
-	
-== Features ==
-- publish fake posts
-- showing published fake posts
-- delete all created fake posts
+= 1.3.0 =
+* **بهبود امنیت**: بررسی سطح دسترسی (`manage_options`)، اعتبارسنجی nonce برای تمام درخواست‌های POST، و Escape خروجی‌های بخش مدیریت
+* **سازگاری کامل** با WordPress 6.9 و PHP 8.0–8.4
+* **بهبود دیکشنری**: استفاده از SQLite3 در صورت دسترس‌بودن و **جایگزین JSON** وقتی SQLite موجود نباشد
+* **تصویر شاخص آزمایشی (Placeholder)** با GD: امکان ساخت و انتساب تصویر ساده به عنوان Thumbnail
+* بهبود تولید متن فارسی (عنوان و پاراگراف‌ها طبیعی‌تر)
+* تکمیل پشتیبانی از **i18n** و بارگذاری درست Text Domain (`persian-fake-contents`)
+* به‌روزرسانی هدرهای افزونه و readme (Requires/Stable tag/Tested up to)
+* پاکسازی کد و رفع هشدارها/اعلان‌ها در نسخه‌های جدید PHP
 
+= 1.2 =
+* قابلیت افزودن محتوای جعلی در پست‌تایپ‌های سفارشی
+* قابلیت تنظیم نویسنده پست‌های جعلی ایجاد شده
+* قابلیت افزودن دسته‌بندی
+* قابلیت ایجاد به صورت پیش‌نویس
+* حل مشکل حذف یکباره‌ی تمام محتویات جعلی ایجاد شده
+
+= 1.1 =
+* افزودن قابلیت ایجاد صفحه (Page)
+* قابلیت ایجاد به صورت پیش‌نویس
+* حل مشکل حذف یکباره‌ی تمام محتویات جعلی ایجاد شده
+
+= 1.0 =
+* انتشار نسخه اولیه
+
+== Upgrade Notice ==
+= 1.3.0 =
+ارتقای مهم امنیتی و سازگاری با WordPress 6.9 و PHP 8+. لطفاً به نسخه ۱.۳.۰ به‌روزرسانی کنید تا از nonces، بررسی سطح دسترسی، JSON fallback و بهبودهای عملکردی بهره‌مند شوید.
 
 == Contact us ==
 You can send me an email to (ehsan[dot]shariaty[at]gmail[dot]com)
-
