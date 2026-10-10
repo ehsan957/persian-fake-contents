@@ -40,6 +40,14 @@ jobs:
           [ -n "$SVN_USERNAME" ] || { echo "Secret SVN_USERNAME is not set"; exit 1; }
           [ -n "$SVN_PASSWORD" ] || { echo "Secret SVN_PASSWORD is not set"; exit 1; }
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Build JavaScript
+        run: npm ci && npm run build
+
       - name: Install Subversion
         run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion
 

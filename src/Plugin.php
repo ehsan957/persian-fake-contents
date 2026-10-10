@@ -28,6 +28,9 @@ final class Plugin {
 	 * Register hooks.
 	 */
 	public static function init() {
+		( new Rest\Controller() )->register();
+		( new Block() )->register();
+
 		if ( is_admin() ) {
 			( new Admin\Page() )->register();
 			add_filter( 'plugin_action_links_' . plugin_basename( GFPC_FILE ), array( __CLASS__, 'action_links' ) );

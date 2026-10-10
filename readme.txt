@@ -2,14 +2,14 @@
 Contributors: ehsan957
 Tags: persian, فارسی, fake content, dummy content, lorem ipsum
 Donate link: mailto:ehsan.shariaty@gmail.com
-Requires at least: 6.3
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Generate Persian/Farsi dummy posts, pages and custom post types with block content, images, tags and comments. Includes WP-CLI commands.
+Generate Persian/Farsi dummy posts, pages, WooCommerce products and editor text, with images, tags and comments. Includes WP-CLI commands.
 
 == Description ==
 **محتوای جعلی فارسی**
@@ -26,6 +26,9 @@ A tool for Persian WordPress developers to quickly create realistic Persian/Fars
 * برچسب‌ها و **دیدگاه‌های** فارسی تصادفی
 * پخش تاریخ انتشار در N روز گذشته
 * تصویر شاخص: **تصویر ساده‌ی محلی (GD)** یا عکس تصادفی از picsum.photos
+* ساخت **محصولات ووکامرس** با قیمت، تخفیف، SKU، موجودی، دسته‌بندی محصول و نقد و بررسی امتیازدار
+* بلوک **Persian Lorem** در ویرایشگر برای درج پاراگراف‌های فارسی (به پاراگراف‌های معمولی تبدیل می‌شود)
+* صفحه‌ی مدیریت جدید با **نوار پیشرفت** و امکان توقف؛ ساخت تا ۵۰۰ مورد در هر بار
 * فرمان‌های **WP-CLI** برای ساخت تعداد زیاد محتوا
 * نمایش و **حذف یک‌جای** همه‌ی محتوا، تصاویر، دیدگاه‌ها و برچسب‌های ساخته‌شده (شامل محتوای نسخه‌های قبلی)
 * بدون نیاز به افزونه‌ی SQLite در PHP
@@ -47,8 +50,12 @@ If you choose "Random photo (downloaded from picsum.photos)" as the featured ima
 = راهنمای استفاده =
 1. افزونه را نصب و فعال کنید.
 2. به **ابزارها ← Persian Fake Contents** بروید.
-3. تعداد و گزینه‌ها را انتخاب کرده و دکمه‌ی Generate را بزنید (تا ۵۰ مورد در هر بار؛ برای تعداد بیشتر از WP-CLI استفاده کنید).
-4. برای پاک کردن همه‌چیز، دکمه‌ی «Delete all fake content» را در همان صفحه بزنید.
+3. تعداد و گزینه‌ها را انتخاب کرده و دکمه‌ی Generate را بزنید (تا ۵۰۰ مورد در هر بار؛ برای تعداد بیشتر از WP-CLI استفاده کنید).
+4. برای پاک کردن همه‌چیز، دکمه‌ی «Delete all» را در همان صفحه بزنید.
+5. در ویرایشگر بلوک، بلوک «Persian Lorem» را اضافه کنید (یا تایپ کنید `/لورم`) تا پاراگراف فارسی درج شود.
+
+= محصولات ووکامرس =
+اگر ووکامرس فعال باشد، نوع «Product» در فهرست ظاهر می‌شود. محصولات ساده با قیمت (تومان)، گاهی تخفیف، SKU، موجودی انبار، دسته‌بندی محصول تصادفی، برچسب و نقد و بررسی با امتیاز ساخته می‌شوند.
 
 = منوی افزونه کجا رفت؟ =
 از نسخه‌ی ۲.۰ صفحه‌ی افزونه به زیرمنوی **ابزارها** منتقل شده است.
@@ -57,6 +64,15 @@ If you choose "Random photo (downloaded from picsum.photos)" as the featured ima
 بله. همه‌ی محتوایی که با نسخه‌های ۱.x ساخته شده هم در فهرست نمایش داده و حذف می‌شود.
 
 == Changelog ==
+= 2.1.0 =
+* صفحه‌ی مدیریت جدید (React) با نوار پیشرفت، دکمه‌ی توقف و فهرست صفحه‌بندی‌شده؛ تا ۵۰۰ مورد در هر بار
+* پشتیبانی از ووکامرس: قیمت، تخفیف، SKU، موجودی، دسته‌بندی و برچسب محصول، نقد و بررسی امتیازدار
+* بلوک جدید «Persian Lorem» برای درج پاراگراف و تیتر فارسی در ویرایشگر
+* حذف یک‌جا به‌صورت مرحله‌ای (بدون خطای Timeout در سایت‌های بزرگ)
+* REST API در مسیر `persian-fake/v1`
+* پیش‌نمایش زنده در WordPress Playground
+* حداقل نسخه‌ی وردپرس: ۶.۶
+
 = 2.0.0 =
 * بازنویسی کامل افزونه با ساختار کلاس‌محور
 * محتوای بلوکی (تیتر، پاراگراف، فهرست و نقل‌قول) یا HTML کلاسیک
@@ -108,6 +124,9 @@ If you choose "Random photo (downloaded from picsum.photos)" as the featured ima
 * انتشار نسخه اولیه
 
 == Upgrade Notice ==
+= 2.1.0 =
+صفحه‌ی مدیریت جدید با نوار پیشرفت، پشتیبانی از محصولات ووکامرس و بلوک Persian Lorem. نیازمند وردپرس ۶.۶ یا بالاتر.
+
 = 2.0.0 =
 بازنویسی کامل با محتوای بلوکی، WP-CLI و تصویر شاخص محلی. صفحه‌ی افزونه اکنون در منوی ابزارها است. نیازمند وردپرس ۶.۳ یا بالاتر.
 

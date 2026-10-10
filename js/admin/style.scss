@@ -1,0 +1,83 @@
+.gfpc {
+	max-width: 960px;
+
+	.components-notice {
+		margin: 0 0 12px;
+	}
+
+	.gfpc-card {
+		margin-top: 20px;
+
+		h2 {
+			margin: 0;
+			font-size: 1.2em;
+		}
+
+		h3 {
+			margin: 24px 0 8px;
+		}
+	}
+
+	.gfpc-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 16px;
+	}
+
+	.gfpc-actions {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		margin-top: 24px;
+	}
+
+	.gfpc-progress {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex: 1;
+		margin-bottom: 12px;
+
+		&__bar {
+			flex: 1;
+			height: 8px;
+			border-radius: 4px;
+			background: #dcdcde;
+			overflow: hidden;
+
+			span {
+				display: block;
+				height: 100%;
+				background: var(--wp-admin-theme-color, #3858e9);
+				transition: width 0.2s ease;
+			}
+		}
+
+		&__label {
+			white-space: nowrap;
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	.gfpc-actions .gfpc-progress {
+		margin-bottom: 0;
+	}
+
+	.gfpc-title {
+		direction: rtl;
+		text-align: right;
+	}
+
+	.gfpc-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		margin-top: 12px;
+	}
+
+	.gfpc-cli-hint {
+		margin-top: 20px;
+		color: #646970;
+	}
+}

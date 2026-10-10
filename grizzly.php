@@ -3,8 +3,8 @@
  * Plugin Name:       Persian Fake Contents
  * Plugin URI:        https://wordpress.org/plugins/persian-fake-contents/
  * Description:       Generate Persian/Farsi dummy posts, pages and custom post types for theme and plugin development.
- * Version:           2.0.0
- * Requires at least: 6.3
+ * Version:           2.1.0
+ * Requires at least: 6.6
  * Requires PHP:      8.0
  * Author:            Ehsan Shariaty
  * Author URI:        https://grizzly.ir
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GFPC_VERSION', '2.0.0' );
+define( 'GFPC_VERSION', '2.1.0' );
 define( 'GFPC_FILE', __FILE__ );
 define( 'GFPC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GFPC_URL', plugin_dir_url( __FILE__ ) );

@@ -32,3 +32,16 @@ jobs:
           tools: composer
       - run: composer install --no-interaction --no-progress
       - run: composer phpcs
+
+  js:
+    name: JavaScript lint and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:js
+      - run: npm run build

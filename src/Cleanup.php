@@ -51,15 +51,20 @@ class Cleanup {
 	}
 
 	/**
-	 * Delete all fake posts, their images, comments and fake tags.
+	 * Delete fake posts, their images, comments and fake tags.
 	 *
 	 * @param callable|null $progress Called after each deleted post.
+	 * @param int           $limit    Delete at most this many items (posts and images) per call; 0 = all.
 	 * @return int Number of deleted posts (not counting images).
 	 */
-	public function purge( $progress = null ) {
+	public function purge( $progress = null, $limit = 0 ) {
 		$deleted = 0;
+		$ids     = $this->post_ids( true );
+		if ( $limit ) {
+			$ids = array_slice( $ids, 0, $limit );
+		}
 
-		foreach ( $this->post_ids( true ) as $id ) {
+		foreach ( $ids as $id ) {
 			if ( 'attachment' === get_post_type( $id ) ) {
 				wp_delete_attachment( $id, true );
 				continue;
@@ -72,7 +77,9 @@ class Cleanup {
 			}
 		}
 
-		$this->delete_fake_terms();
+		if ( ! $this->post_ids( true ) ) {
+			$this->delete_fake_terms();
+		}
 
 		return $deleted;
 	}
@@ -81,9 +88,10 @@ class Cleanup {
 	 * Remove fake tags that no longer have posts.
 	 */
 	private function delete_fake_terms() {
-		$terms = get_terms(
+		$taxonomies = array_filter( array( 'post_tag', 'product_tag' ), 'taxonomy_exists' );
+		$terms      = get_terms(
 			array(
-				'taxonomy'   => 'post_tag',
+				'taxonomy'   => array_values( $taxonomies ),
 				'hide_empty' => false,
 				'fields'     => 'ids',
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- admin/CLI only.
@@ -100,9 +108,9 @@ class Cleanup {
 			return;
 		}
 		foreach ( $terms as $term_id ) {
-			$term = get_term( $term_id, 'post_tag' );
+			$term = get_term( $term_id );
 			if ( $term && ! is_wp_error( $term ) && 0 === (int) $term->count ) {
-				wp_delete_term( $term_id, 'post_tag' );
+				wp_delete_term( $term_id, $term->taxonomy );
 			}
 		}
 	}

@@ -169,11 +169,12 @@ class Generator {
 		$authors        = $o['author'] ? array( $o['author'] ) : $this->author_ids();
 		$categories     = self::RANDOM === $o['category'] ? get_terms(
 			array(
-				'taxonomy'   => 'category',
+				'taxonomy'   => self::category_taxonomy( $o['post_type'] ),
 				'hide_empty' => false,
 				'fields'     => 'ids',
 			)
 		) : array();
+		$categories     = is_wp_error( $categories ) ? array() : array_map( 'intval', $categories );
 		$ids            = array();
 
 		for ( $i = 0; $i < $o['count']; $i++ ) {
@@ -200,10 +201,12 @@ class Generator {
 	 * @return int|WP_Error
 	 */
 	private function create_post( array $o, array $authors, array $categories ) {
-		$type    = $o['post_type'];
-		$postarr = array(
+		$type       = $o['post_type'];
+		$is_product = self::is_product( $type );
+		$postarr    = array(
 			'post_title'     => $this->text->title(),
-			'post_content'   => $this->text->content( wp_rand( $o['paragraphs_min'], $o['paragraphs_max'] ), $o['format'] ),
+			// WooCommerce's product screen uses the classic editor.
+			'post_content'   => $this->text->content( wp_rand( $o['paragraphs_min'], $o['paragraphs_max'] ), $is_product ? 'classic' : $o['format'] ),
 			'post_type'      => $type,
 			'post_status'    => $o['status'],
 			'post_author'    => $authors ? $authors[ array_rand( $authors ) ] : get_current_user_id(),
@@ -221,12 +224,17 @@ class Generator {
 			$postarr['post_date_gmt'] = gmdate( 'Y-m-d H:i:s', $timestamp );
 		}
 
-		if ( is_object_in_taxonomy( $type, 'category' ) ) {
-			if ( $o['category'] > 0 ) {
-				$postarr['post_category'] = array( $o['category'] );
+		$category_taxonomy = self::category_taxonomy( $type );
+		$category_id       = 0;
+		if ( is_object_in_taxonomy( $type, $category_taxonomy ) ) {
+			if ( $o['category'] > 0 && 'category' === $category_taxonomy ) {
+				$category_id = $o['category'];
 			} elseif ( $categories ) {
-				$postarr['post_category'] = array( $categories[ array_rand( $categories ) ] );
+				$category_id = $categories[ array_rand( $categories ) ];
 			}
+		}
+		if ( $category_id && 'category' === $category_taxonomy ) {
+			$postarr['post_category'] = array( $category_id );
 		}
 
 		$post_id = wp_insert_post( wp_slash( $postarr ), true );
@@ -234,12 +242,21 @@ class Generator {
 			return $post_id;
 		}
 
-		if ( $o['tags'] && is_object_in_taxonomy( $type, 'post_tag' ) ) {
-			wp_set_post_terms( $post_id, $this->tag_ids( wp_rand( 1, $o['tags'] ) ), 'post_tag' );
+		if ( $category_id && 'category' !== $category_taxonomy ) {
+			wp_set_object_terms( $post_id, $category_id, $category_taxonomy );
+		}
+
+		$tag_taxonomy = $is_product ? 'product_tag' : 'post_tag';
+		if ( $o['tags'] && is_object_in_taxonomy( $type, $tag_taxonomy ) ) {
+			wp_set_object_terms( $post_id, $this->tag_ids( wp_rand( 1, $o['tags'] ), $tag_taxonomy ), $tag_taxonomy );
+		}
+
+		if ( $is_product ) {
+			$this->setup_product( $post_id );
 		}
 
 		if ( $o['comments'] && post_type_supports( $type, 'comments' ) ) {
-			$this->add_comments( $post_id, wp_rand( 0, $o['comments'] ), $postarr['post_date_gmt'] ?? null );
+			$this->add_comments( $post_id, wp_rand( 0, $o['comments'] ), $postarr['post_date_gmt'] ?? null, $is_product );
 		}
 
 		if ( 'none' !== $o['image'] && post_type_supports( $type, 'thumbnail' ) ) {
@@ -250,6 +267,49 @@ class Generator {
 		}
 
 		return $post_id;
+	}
+
+	/**
+	 * Whether the post type is a WooCommerce product we can fill with product data.
+	 *
+	 * @param string $type Post type.
+	 * @return bool
+	 */
+	public static function is_product( $type ) {
+		return 'product' === $type && function_exists( 'wc_get_product' );
+	}
+
+	/**
+	 * Taxonomy used for the "Category" option of a post type.
+	 *
+	 * @param string $type Post type.
+	 * @return string
+	 */
+	public static function category_taxonomy( $type ) {
+		return self::is_product( $type ) ? 'product_cat' : 'category';
+	}
+
+	/**
+	 * Give a WooCommerce product a price, SKU and stock. The excerpt is already its short description.
+	 *
+	 * @param int $post_id Product ID.
+	 */
+	private function setup_product( $post_id ) {
+		$product = wc_get_product( $post_id );
+		if ( ! $product ) {
+			return;
+		}
+
+		// Round numbers in the range shops in Iran typically use (Toman).
+		$price = wp_rand( 10, 500 ) * 10000;
+		$product->set_regular_price( (string) $price );
+		if ( wp_rand( 1, 100 ) <= 30 ) {
+			$product->set_sale_price( (string) ( round( $price * wp_rand( 60, 90 ) / 100 / 1000 ) * 1000 ) );
+		}
+		$product->set_sku( 'PFC-' . $post_id );
+		$product->set_manage_stock( true );
+		$product->set_stock_quantity( wp_rand( 0, 100 ) );
+		$product->save();
 	}
 
 	/**
@@ -273,19 +333,20 @@ class Generator {
 	/**
 	 * Get or create tags named with random words. Newly created tags are marked as fake.
 	 *
-	 * @param int $count Number of tags.
+	 * @param int    $count    Number of tags.
+	 * @param string $taxonomy Tag taxonomy.
 	 * @return int[]
 	 */
-	private function tag_ids( $count ) {
+	private function tag_ids( $count, $taxonomy = 'post_tag' ) {
 		$ids = array();
 		for ( $i = 0; $i < $count; $i++ ) {
 			$name     = $this->text->phrase( 1, 2 );
-			$existing = term_exists( $name, 'post_tag' );
+			$existing = term_exists( $name, $taxonomy );
 			if ( $existing ) {
 				$ids[] = (int) $existing['term_id'];
 				continue;
 			}
-			$term = wp_insert_term( $name, 'post_tag' );
+			$term = wp_insert_term( $name, $taxonomy );
 			if ( ! is_wp_error( $term ) ) {
 				add_term_meta( $term['term_id'], Plugin::META_KEY, Plugin::META_VALUE, true );
 				$ids[] = (int) $term['term_id'];
@@ -295,21 +356,23 @@ class Generator {
 	}
 
 	/**
-	 * Add approved comments from fake Persian names.
+	 * Add approved comments (or rated product reviews) from fake Persian names.
 	 *
-	 * @param int         $post_id  Post ID.
-	 * @param int         $count    Number of comments.
+	 * @param int         $post_id   Post ID.
+	 * @param int         $count     Number of comments.
 	 * @param string|null $after_gmt Comments are dated after this GMT date, if given.
+	 * @param bool        $reviews   Create WooCommerce reviews with star ratings.
 	 */
-	private function add_comments( $post_id, $count, $after_gmt ) {
+	private function add_comments( $post_id, $count, $after_gmt, $reviews = false ) {
 		$first = array( 'علی', 'زهرا', 'محمد', 'فاطمه', 'حسین', 'مریم', 'رضا', 'سارا', 'امیر', 'نگار', 'مهدی', 'الهام', 'سینا', 'پریسا', 'کاوه', 'شیرین' );
 		$last  = array( 'احمدی', 'محمدی', 'حسینی', 'رضایی', 'کریمی', 'موسوی', 'جعفری', 'رحیمی', 'صادقی', 'نوری', 'کاظمی', 'هاشمی' );
 		$start = $after_gmt ? strtotime( $after_gmt . ' UTC' ) : time();
 
 		for ( $i = 0; $i < $count; $i++ ) {
-			$timestamp = wp_rand( $start, max( $start, time() ) );
-			wp_insert_comment(
+			$timestamp  = wp_rand( $start, max( $start, time() ) );
+			$comment_id = wp_insert_comment(
 				array(
+					'comment_type'         => $reviews ? 'review' : 'comment',
 					'comment_post_ID'      => $post_id,
 					'comment_author'       => $first[ array_rand( $first ) ] . ' ' . $last[ array_rand( $last ) ],
 					'comment_author_email' => 'fake' . wp_rand( 1000, 9999 ) . '@example.com',
@@ -319,6 +382,14 @@ class Generator {
 					'comment_date_gmt'     => gmdate( 'Y-m-d H:i:s', $timestamp ),
 				)
 			);
+			if ( $reviews && $comment_id ) {
+				// Mostly good ratings, like a real shop.
+				add_comment_meta( $comment_id, 'rating', wp_rand( 1, 100 ) <= 70 ? wp_rand( 4, 5 ) : wp_rand( 1, 3 ) );
+			}
+		}
+
+		if ( $reviews && $count && class_exists( 'WC_Comments' ) ) {
+			\WC_Comments::clear_transients( $post_id );
 		}
 	}
 }

@@ -8,5 +8,6 @@
 .gitignore
 composer.json
 composer.lock
+package-lock.json
 phpcs.xml.dist
 README.md

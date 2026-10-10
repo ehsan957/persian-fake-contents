@@ -3,13 +3,14 @@
 	<file>.</file>
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
 	<exclude-pattern>/data/words.php</exclude-pattern>
 
 	<arg name="extensions" value="php"/>
 	<arg name="colors"/>
 	<arg value="sp"/>
 
-	<config name="minimum_wp_version" value="6.3"/>
+	<config name="minimum_wp_version" value="6.6"/>
 	<config name="testVersion" value="8.0-"/>
 
 	<rule ref="WordPress">

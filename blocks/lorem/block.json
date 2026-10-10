@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "persian-fake-contents/lorem",
+	"title": "Persian Lorem",
+	"description": "Insert random Persian paragraphs (لورم ایپسوم فارسی).",
+	"category": "text",
+	"icon": "editor-paragraph",
+	"keywords": [ "lorem", "ipsum", "persian", "farsi", "لورم", "متن", "فارسی" ],
+	"textdomain": "persian-fake-contents",
+	"attributes": {
+		"paragraphs": {
+			"type": "number",
+			"default": 3
+		},
+		"headings": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"inserter": true
+	}
+}
