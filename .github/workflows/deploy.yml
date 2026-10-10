@@ -1,0 +1,38 @@
+name: Deploy to WordPress.org
+
+# Publish a GitHub release tagged with the version (e.g. 2.0.0) to deploy.
+# Needs repository secrets SVN_USERNAME and SVN_PASSWORD (your wordpress.org login).
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check versions match the tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          grep -q "^ \* Version: *${TAG}$" grizzly.php || { echo "grizzly.php Version is not ${TAG}"; exit 1; }
+          grep -q "^Stable tag: ${TAG}$" readme.txt || { echo "readme.txt Stable tag is not ${TAG}"; exit 1; }
+
+      - name: Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: persian-fake-contents
+
+      - name: Attach zip to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${GITHUB_REF_NAME}" "${{ steps.deploy.outputs.zip-path }}" --clobber

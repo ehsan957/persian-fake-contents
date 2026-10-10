@@ -1,0 +1,39 @@
+.gfpc .gfpc-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 4px 20px 16px;
+	margin-top: 20px;
+	max-width: 960px;
+	box-sizing: border-box;
+}
+
+.gfpc .gfpc-card h2 {
+	margin-top: 1em;
+}
+
+.gfpc .form-table td label {
+	display: inline-block;
+	margin: 0 8px 6px 0;
+}
+
+.gfpc .gfpc-title {
+	direction: rtl;
+	text-align: right;
+}
+
+.gfpc .gfpc-purge {
+	margin-top: 16px;
+}
+
+.gfpc .button.delete {
+	color: #b32d2e;
+	border-color: #b32d2e;
+}
+
+.gfpc .button.delete:hover,
+.gfpc .button.delete:focus {
+	color: #fff;
+	background: #b32d2e;
+	border-color: #b32d2e;
+}

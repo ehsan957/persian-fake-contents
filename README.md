@@ -1,88 +1,45 @@
-=== محتوای جعلی فارسی ===
-Contributors: ehsan957
-Tags: persian, content, فارسی, fake, محتوا, lorem ipsum
-Donate link: mailto:ehsan.shariaty@gmail.com
-Tested up to: 6.9
-Requires at least: 5.9
-Requires PHP: 8.0
-Stable tag: 1.3.1
-License: GPL 3
-License URI: http://www.gnu.org/licenses/gpl-3.0.html
+# Persian Fake Contents
 
-== Description ==
-**محتوای جعلی فارسی**  
-A tool for Persian WordPress developers to quickly create fake posts/pages in Persian/Farsi for testing and development.
+Generate Persian/Farsi dummy posts, pages and custom post types for WordPress theme and plugin development.
 
-این یک ابزار ساده و رایگان برای طراحان سایت با سیستم مدیریت محتوای وردپرس است که این امکان را فراهم می‌آورد تا مطالب جعلی به زبان فارسی ایجاد کنند. مناسب برای تست قالب‌ها، چیدمان‌ها، فهرست‌ها و سایدبارها با متن و عنوان فارسی.
+[WordPress.org plugin page](https://wordpress.org/plugins/persian-fake-contents/) · wordpress.org readme: [`readme.txt`](readme.txt)
 
-= Features =
-* ایجاد محتوای جعلی برای **پست‌ها، برگه‌ها و پست‌تایپ‌های سفارشی**
-* تعیین وضعیت انتشار: پیش‌نویس، در انتظار بازبینی، منتشرشده
-* تعیین نویسنده و دسته‌بندی (برای پست‌تایپ‌هایی که دسته‌بندی دارند)
-* افزودن تصویر شاخص تصادفی از picsum.photos (اختیاری)
-* نمایش و **حذف یک‌جای** همه‌ی آیتم‌ها و تصاویر ایجادشده
-* دیکشنری بیش از ۷۰۰۰ واژه‌ی فارسی (SQLite)
+## Features
 
-= Requirements =
-* افزونه‌ی SQLite3 در PHP باید فعال باشد.
+- Block-editor content (headings, paragraphs, lists, quotes) or classic HTML
+- Persian punctuation and frequency-weighted words for natural-looking text
+- Random authors, categories, tags, comments and publish dates
+- Featured images drawn locally with GD, or downloaded from picsum.photos
+- WP-CLI commands for bulk generation
+- One-click removal of everything the plugin created (including content from 1.x)
 
-= External services =
-اگر گزینه‌ی «Add featured image» را فعال کنید، افزونه برای هر پست یک تصویر تصادفی از سرویس [Lorem Picsum](https://picsum.photos/) دانلود می‌کند. در این درخواست هیچ اطلاعاتی از سایت یا کاربران شما ارسال نمی‌شود (فقط آدرس IP سرور شما برای سرویس قابل مشاهده است). در صورت فعال نکردن این گزینه، هیچ درخواست خارجی‌ای انجام نمی‌شود.
-If you enable "Add featured image", the plugin downloads a random image per post from [Lorem Picsum](https://picsum.photos/). No site or user data is sent. Without that option no external request is made.
+## Usage
 
-== Frequently asked questions ==
+**Admin:** Tools → Persian Fake Contents (up to 50 items per run).
 
-= راهنمای نصب =
-1. افزونه را نصب و فعال کنید.
-2. از منوی «Persian Content» در پیشخوان، تعداد (۱ تا ۱۰)، نوع، دسته‌بندی، نویسنده و وضعیت را انتخاب کرده و دکمه Create را بزنید.
-3. می‌توانید این کار را بارها تکرار کنید.
-4. تمام محتوای ایجادشده (و تصاویر شاخص آن‌ها) از طریق همین صفحه قابل حذف هستند.
+**WP-CLI:**
 
-== Screenshots ==
-به‌زودی با تصاویر جدید!
+```sh
+wp persian-fake generate --count=50 --category=random --tags=3 --comments=5 --image=placeholder --days=90
+wp persian-fake list
+wp persian-fake purge --yes
+wp help persian-fake generate
+```
 
-== Changelog ==
-= 1.3.1 =
-* امنیت: اعتبارسنجی nonce برای فرم‌های ایجاد و حذف (جلوگیری از CSRF)
-* امنیت: بررسی سطح دسترسی `manage_options` و Escape تمام خروجی‌های صفحه‌ی مدیریت
-* اعتبارسنجی ورودی‌ها (نوع پست، وضعیت، نویسنده، دسته‌بندی)
-* رفع مشکل حذف شدن پاراگراف‌ها از محتوای پست
-* رفع مشکل حذف تصاویر شاخص هنگام حذف یک‌جا
-* تصویر شاخص اکنون اختیاری است و خطای دانلود آن مدیریت می‌شود
-* افزودن وضعیت «در انتظار بازبینی»
-* نمایش پیغام خطا در صورت نبود SQLite3 به‌جای خطای مرگبار
-* دسته‌بندی فقط برای پست‌تایپ‌هایی که از آن پشتیبانی می‌کنند اعمال می‌شود
-* بهبود کارایی: دیکشنری در هر اجرا فقط یک بار خوانده می‌شود
-* آماده‌سازی رشته‌ها برای ترجمه با Text Domain `persian-fake-contents`
+## Hooks
 
-= 1.3.0 =
-* **بهبود امنیت**: بررسی سطح دسترسی (`manage_options`)، اعتبارسنجی nonce برای تمام درخواست‌های POST، و Escape خروجی‌های بخش مدیریت
-* **سازگاری کامل** با WordPress 6.9 و PHP 8.0–8.4
-* **بهبود دیکشنری**: استفاده از SQLite3 در صورت دسترس‌بودن و **جایگزین JSON** وقتی SQLite موجود نباشد
-* **تصویر شاخص آزمایشی (Placeholder)** با GD: امکان ساخت و انتساب تصویر ساده به عنوان Thumbnail
-* بهبود تولید متن فارسی (عنوان و پاراگراف‌ها طبیعی‌تر)
-* تکمیل پشتیبانی از **i18n** و بارگذاری درست Text Domain (`persian-fake-contents`)
-* به‌روزرسانی هدرهای افزونه و readme (Requires/Stable tag/Tested up to)
-* پاکسازی کد و رفع هشدارها/اعلان‌ها در نسخه‌های جدید PHP
+- `gfpc_words` (filter): replace or extend the Persian word list (most frequent words first).
 
-= 1.2 =
-* قابلیت افزودن محتوای جعلی در پست‌تایپ‌های سفارشی
-* قابلیت تنظیم نویسنده پست‌های جعلی ایجاد شده
-* قابلیت افزودن دسته‌بندی
-* قابلیت ایجاد به صورت پیش‌نویس
-* حل مشکل حذف یکباره‌ی تمام محتویات جعلی ایجاد شده
+## Development
 
-= 1.1 =
-* افزودن قابلیت ایجاد صفحه (Page)
-* قابلیت ایجاد به صورت پیش‌نویس
-* حل مشکل حذف یکباره‌ی تمام محتویات جعلی ایجاد شده
+```sh
+composer install
+composer lint   # PHP syntax
+composer phpcs  # WordPress Coding Standards
+```
 
-= 1.0 =
-* انتشار نسخه اولیه
+Publishing a GitHub release deploys the tagged version to wordpress.org SVN (see `.github/workflows/deploy.yml`). Use the version number without a `v` as the tag, e.g. `2.0.0`.
 
-== Upgrade Notice ==
-= 1.3.1 =
-به‌روزرسانی امنیتی مهم (nonce، بررسی دسترسی و Escape خروجی‌ها). لطفاً به‌روزرسانی کنید.
+## License
 
-== Contact us ==
-You can send me an email to (ehsan[dot]shariaty[at]gmail[dot]com)
+GPL-3.0-or-later
