@@ -1,26 +1,47 @@
 name: Deploy to WordPress.org
 
-# Publish a GitHub release tagged with the version (e.g. 2.0.0) to deploy.
-# Needs repository secrets SVN_USERNAME and SVN_PASSWORD (your wordpress.org login).
+# Publish a GitHub release tagged with the version (e.g. 2.0.0) to deploy,
+# or run it manually from the Actions tab with the version to (re)deploy.
+# Needs repository secrets SVN_USERNAME (wordpress.org username) and
+# SVN_PASSWORD (the SVN password generated in your wordpress.org profile, not your login password).
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (must match Version in grizzly.php and Stable tag in readme.txt)'
+        required: true
 
 permissions:
   contents: write
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      PLUGIN_VERSION: ${{ github.event.inputs.version || github.event.release.tag_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Check versions match the tag
+      - name: Check versions match
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
-          grep -q "^ \* Version: *${TAG}$" grizzly.php || { echo "grizzly.php Version is not ${TAG}"; exit 1; }
-          grep -q "^Stable tag: ${TAG}$" readme.txt || { echo "readme.txt Stable tag is not ${TAG}"; exit 1; }
+          VERSION="${PLUGIN_VERSION#v}"
+          echo "PLUGIN_VERSION=${VERSION}" >> "$GITHUB_ENV"
+          grep -q "^ \* Version: *${VERSION}$" grizzly.php || { echo "grizzly.php Version is not ${VERSION}"; exit 1; }
+          grep -q "^Stable tag: ${VERSION}$" readme.txt || { echo "readme.txt Stable tag is not ${VERSION}"; exit 1; }
+
+      - name: Check SVN secrets
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          [ -n "$SVN_USERNAME" ] || { echo "Secret SVN_USERNAME is not set"; exit 1; }
+          [ -n "$SVN_PASSWORD" ] || { echo "Secret SVN_PASSWORD is not set"; exit 1; }
+
+      - name: Install Subversion
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion
 
       - name: Deploy
         id: deploy
@@ -31,8 +52,15 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: persian-fake-contents
+          VERSION: ${{ env.PLUGIN_VERSION }}
 
       - name: Attach zip to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${GITHUB_REF_NAME}" "${{ steps.deploy.outputs.zip-path }}" --clobber
+        run: |
+          TAG="$(gh release list --json tagName --jq '.[].tagName' | grep -E "^v?${PLUGIN_VERSION}$" | head -1)"
+          if [ -n "$TAG" ]; then
+            gh release upload "$TAG" "${{ steps.deploy.outputs.zip-path }}" --clobber
+          else
+            echo "No GitHub release for ${PLUGIN_VERSION}; skipping zip upload."
+          fi
